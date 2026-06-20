@@ -1,9 +1,87 @@
 application:
-  name: huly-web
+  name: huly
   pods:
-    - name: app
-      image: "registry.nexlayer.io/user_01kece1xyh817dwff7wnarhkxd/huly-selfhost:9f1ffa5-fix5"
-      path: /
-      servicePorts:
-        - 80
-      vars: {}
+  - name: front
+    image: mirror.gcr.io/hardcoreeng/front:latest
+    path: /
+    servicePorts:
+    - 8087
+    vars:
+      SERVER_PORT: "8083"
+      SERVER_SECRET: "huly-server-secret-changeme"
+      MONGO_URL: mongodb://mongo.pod:27017
+      TITLE: Huly
+      DEFAULT_LANGUAGE: en
+      ACCOUNTS_URL: "wss://relaxed-weasel-huly.cloud.nexlayer.ai/account"
+      TRANSACTOR_URL: "wss://relaxed-weasel-huly.cloud.nexlayer.ai/ws/transactor"
+      COLLABORATOR_URL: "wss://relaxed-weasel-huly.cloud.nexlayer.ai/ws/collaborator"
+      MINIO_ENDPOINT: minio.pod
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+  - name: account
+    image: mirror.gcr.io/hardcoreeng/account:latest
+    servicePorts:
+    - 3000
+    vars:
+      SERVER_PORT: "3000"
+      SERVER_SECRET: "huly-server-secret-changeme"
+      MONGO_URL: mongodb://mongo.pod:27017
+      FRONT_URL: "https://relaxed-weasel-huly.cloud.nexlayer.ai"
+      TRANSACTOR_URL: "ws://transactor.pod:3333"
+      MINIO_ENDPOINT: minio.pod
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+  - name: transactor
+    image: mirror.gcr.io/hardcoreeng/transactor:latest
+    servicePorts:
+    - 3333
+    vars:
+      SERVER_PORT: "3333"
+      SERVER_SECRET: "huly-server-secret-changeme"
+      MONGO_URL: mongodb://mongo.pod:27017
+      FRONT_URL: "https://relaxed-weasel-huly.cloud.nexlayer.ai"
+      ACCOUNTS_URL: "ws://account.pod:3000"
+      MINIO_ENDPOINT: minio.pod
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+  - name: collaborator
+    image: mirror.gcr.io/hardcoreeng/collaborator:latest
+    servicePorts:
+    - 3578
+    vars:
+      SERVER_PORT: "3578"
+      SERVER_SECRET: "huly-server-secret-changeme"
+      MONGO_URL: mongodb://mongo.pod:27017
+      ACCOUNTS_URL: "ws://account.pod:3000"
+      MINIO_ENDPOINT: minio.pod
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+  - name: minio
+    image: mirror.gcr.io/minio/minio:latest
+    servicePorts:
+    - 9000
+    - 9001
+    command:
+    - server
+    - /data
+    - --console-address
+    - ":9001"
+    vars:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+    - name: huly-minio-data
+      mountPath: /data
+      size: 20Gi
+  - name: mongo
+    image: mirror.gcr.io/library/mongo:7
+    servicePorts:
+    - 27017
+    volumes:
+    - name: huly-db
+      mountPath: /data/db
+      size: 10Gi
