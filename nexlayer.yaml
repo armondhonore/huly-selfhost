@@ -12,9 +12,16 @@ application:
       MONGO_URL: mongodb://mongo.pod:27017
       TITLE: Huly
       DEFAULT_LANGUAGE: en
-      ACCOUNTS_URL: "wss://relaxed-weasel-huly.cloud.nexlayer.ai/account"
-      TRANSACTOR_URL: "wss://relaxed-weasel-huly.cloud.nexlayer.ai/ws/transactor"
-      COLLABORATOR_URL: "wss://relaxed-weasel-huly.cloud.nexlayer.ai/ws/collaborator"
+      # ACCOUNTS_URL must be https:// (not wss://) — Huly converts to WebSocket internally.
+      # After deploy, create nexroute routes:
+      #   <namespace>-huly-account.cloud.nexlayer.ai / → huly-account-service:3000
+      #   <namespace>-huly-collaborator.cloud.nexlayer.ai / → huly-collaborator-service:3078
+      #   <namespace>-huly-transactor.cloud.nexlayer.ai / → huly-transactor-service:3333
+      # Then patch these env vars to match your namespace.
+      ACCOUNTS_URL: "https://relaxed-weasel-huly-account.cloud.nexlayer.ai"
+      TRANSACTOR_URL: "wss://relaxed-weasel-huly-transactor.cloud.nexlayer.ai"
+      COLLABORATOR_URL: "https://relaxed-weasel-huly-collaborator.cloud.nexlayer.ai"
+      BRANDING_URL: "https://huly.app/branding.json"
       MINIO_ENDPOINT: minio.pod
       MINIO_PORT: "9000"
       MINIO_ACCESS_KEY: minioadmin
@@ -27,7 +34,7 @@ application:
       SERVER_PORT: "3000"
       SERVER_SECRET: "huly-server-secret-changeme"
       MONGO_URL: mongodb://mongo.pod:27017
-      FRONT_URL: "https://relaxed-weasel-huly.cloud.nexlayer.ai"
+      FRONT_URL: "https://relaxed-weasel-huly-selfhost.cloud.nexlayer.ai"
       TRANSACTOR_URL: "ws://transactor.pod:3333"
       MINIO_ENDPOINT: minio.pod
       MINIO_PORT: "9000"
@@ -41,7 +48,7 @@ application:
       SERVER_PORT: "3333"
       SERVER_SECRET: "huly-server-secret-changeme"
       MONGO_URL: mongodb://mongo.pod:27017
-      FRONT_URL: "https://relaxed-weasel-huly.cloud.nexlayer.ai"
+      FRONT_URL: "https://relaxed-weasel-huly-selfhost.cloud.nexlayer.ai"
       ACCOUNTS_URL: "ws://account.pod:3000"
       MINIO_ENDPOINT: minio.pod
       MINIO_PORT: "9000"
@@ -50,9 +57,9 @@ application:
   - name: collaborator
     image: mirror.gcr.io/hardcoreeng/collaborator:latest
     servicePorts:
-    - 3578
+    - 3078
     vars:
-      SERVER_PORT: "3578"
+      SERVER_PORT: "3078"
       SERVER_SECRET: "huly-server-secret-changeme"
       MONGO_URL: mongodb://mongo.pod:27017
       ACCOUNTS_URL: "ws://account.pod:3000"
