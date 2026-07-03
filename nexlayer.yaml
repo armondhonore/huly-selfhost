@@ -42,15 +42,11 @@ application:
       SERVER_SECRET: "huly-server-secret-changeme"
       MONGO_URL: mongodb://mongo.pod:27017
       FRONT_URL: "https://relaxed-weasel-huly.cloud.nexlayer.ai"
-<<<<<<< HEAD
       ACCOUNTS_URL: "ws://account.pod:3000"
       MINIO_ENDPOINT: minio.pod
       MINIO_PORT: "9000"
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin123
-=======
-      ACCOUNTS_URL: "http://account.pod:3000"
->>>>>>> daecb97 (fix: hardcode API/WEB/CORS URLs)
   - name: collaborator
     image: mirror.gcr.io/hardcoreeng/collaborator:latest
     servicePorts:
